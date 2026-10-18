@@ -144,7 +144,6 @@ main .wrap { padding-block: 28px; display: flex; flex-direction: column; gap: 26
 footer { flex: none; padding-bottom: 10px; }
 footer .wrap { padding-top: 10px; }
 
-/* Selector de versión */
 .tiers {
   position: relative; display: grid; grid-template-columns: repeat(3, 1fr);
   background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
@@ -170,15 +169,25 @@ footer .wrap { padding-top: 10px; }
 }
 .tierdesc.out { opacity: 0; }
 
-form { display: flex; align-items: flex-end; gap: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 8px 8px 8px 14px; transition: border-color .2s; }
+form { display: flex; align-items: flex-end; gap: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 8px; transition: border-color .2s; }
 form:focus-within { border-color: var(--accent); }
 textarea {
   flex: 1; min-width: 0; resize: none; border: none; outline: none;
   background: transparent; color: var(--ink);
-  font: inherit; line-height: 1.5; padding: 7px 0; max-height: 160px;
+  font: inherit; line-height: 1.5; padding: 7px 4px; max-height: 160px;
 }
 textarea::placeholder { color: var(--muted); }
 textarea:focus-visible { outline: none; }
+.icon {
+  flex: none; width: 40px; height: 40px; border: none; border-radius: 11px;
+  background: transparent; color: var(--muted); cursor: pointer;
+  display: grid; place-items: center;
+  transition: color .2s, background .2s, transform .15s;
+}
+.icon:hover:not(:disabled) { color: var(--accent); background: var(--bg); }
+.icon:disabled { opacity: 0.4; cursor: default; }
+.icon.rec { background: var(--danger); color: #fff; animation: recpulse 1.2s infinite; }
+@keyframes recpulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(180, 49, 31, 0.5); } 50% { box-shadow: 0 0 0 8px rgba(180, 49, 31, 0); } }
 .send {
   flex: none; width: 40px; height: 40px; border: none; border-radius: 11px;
   background: var(--accent); color: var(--accent-ink); cursor: pointer;
@@ -194,6 +203,7 @@ textarea:focus-visible { outline: none; }
 @media (prefers-reduced-motion: reduce) {
   .dots i { animation: none; opacity: 0.7; }
   .msg { animation: none; }
+  .icon.rec { animation: none; }
   .tiers .pill { transition: none; }
   main { scroll-behavior: auto; }
 }
@@ -220,7 +230,7 @@ textarea:focus-visible { outline: none; }
   <div class="wrap" id="chat">
     <section class="hello" id="hello">
       <h2>Pregúntame lo que quieras.</h2>
-      <p>Escribe en español o en cualquier otro idioma. Puedo explicar, redactar, resumir, traducir o ayudarte con código.</p>
+      <p>Escribe en español o en cualquier otro idioma, o pulsa el micrófono y dímelo con tu voz. Puedo explicar, redactar, resumir, traducir o ayudarte con código.</p>
       <div class="chips" id="chips"></div>
     </section>
   </div>
@@ -235,7 +245,11 @@ textarea:focus-visible { outline: none; }
       <button type="button" role="radio" data-tier="pro" aria-checked="false">Pro</button>
     </div>
     <p class="tierdesc" id="tierdesc"></p>
+
     <form id="form" autocomplete="off">
+      <button type="button" class="icon" id="mic" aria-label="Grabar audio" title="Grabar audio">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3" stroke="currentColor" stroke-width="2"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
       <textarea id="input" rows="1" placeholder="Escribe tu mensaje…" aria-label="Mensaje para Eco"></textarea>
       <button type="submit" class="send" id="send" aria-label="Enviar mensaje" disabled>
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 14.5V3.5M9 3.5L4 8.5M9 3.5L14 8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -265,8 +279,9 @@ textarea:focus-visible { outline: none; }
     pro:    { name: "Pro",    index: 2, desc: "El más listo, algo más lento" }
   };
 
-  var PAGE_VERSION = "web 1.2";
+  var PAGE_VERSION = "web 1.3";
   var ENDPOINT = "https://eco.x-mayor.workers.dev";
+  var MAX_REC_MS = 120000;
 
   var chat = document.getElementById("chat");
   var scroller = document.getElementById("scroll");
@@ -281,6 +296,7 @@ textarea:focus-visible { outline: none; }
   var pill = document.getElementById("pill");
   var tierDesc = document.getElementById("tierdesc");
   var tierLabel = document.getElementById("tierLabel");
+  var micBtn = document.getElementById("mic");
 
   var sample = null;
   var turns = [];
@@ -288,9 +304,16 @@ textarea:focus-visible { outline: none; }
   var ctl = null;
   var epoch = 0;
   var tier = "basic";
+  var recorder = null;
+  var recChunks = [];
+  var recStream = null;
+  var recTimer = null;
+  var recDiscard = false;
+  var transcribing = false;
 
   var ICON_SEND = sendBtn.innerHTML;
   var ICON_STOP = '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="3" width="10" height="10" rx="2" fill="currentColor"/></svg>';
+  var ICON_MIC = micBtn.innerHTML;
 
   function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
   function inline(s) {
@@ -377,6 +400,23 @@ textarea:focus-visible { outline: none; }
     return { box: m, body: b };
   }
 
+  function addNote(message, retry) {
+    var note = document.createElement("div");
+    note.className = "note";
+    var msg = document.createElement("span");
+    msg.textContent = message;
+    note.appendChild(msg);
+    if (retry) {
+      var rb = document.createElement("button");
+      rb.type = "button";
+      rb.textContent = "Reintentar";
+      rb.addEventListener("click", function () { note.remove(); retry(); });
+      note.appendChild(rb);
+    }
+    chat.appendChild(note);
+    toBottom();
+  }
+
   function setBusy(v) {
     busy = v;
     sendBtn.innerHTML = v ? ICON_STOP : ICON_SEND;
@@ -388,6 +428,7 @@ textarea:focus-visible { outline: none; }
   function refresh() {
     sendBtn.disabled = !sample || (!busy && !input.value.trim());
     resetBtn.disabled = turns.length === 0 && !busy;
+    micBtn.disabled = busy || transcribing;
   }
 
   function errorCopy(code) {
@@ -468,24 +509,10 @@ textarea:focus-visible { outline: none; }
         }
         return;
       }
-      var note = document.createElement("div");
-      note.className = "note";
-      var msg = document.createElement("span");
-      msg.textContent = errorCopy(code) + (e && e.detail ? " [" + e.detail + "]" : "");
-      note.appendChild(msg);
-      if (code !== "prompt_too_large") {
-        var rb = document.createElement("button");
-        rb.type = "button";
-        rb.textContent = "Reintentar";
-        rb.addEventListener("click", function () {
-          note.remove();
-          if (turns.length && turns[turns.length - 1].role === "assistant") turns.push({ role: "user", content: "Continúa." });
-          run();
-        });
-        note.appendChild(rb);
-      }
-      chat.appendChild(note);
-      toBottom();
+      addNote(errorCopy(code) + (e && e.detail ? " [" + e.detail + "]" : ""), code !== "prompt_too_large" ? function () {
+        if (turns.length && turns[turns.length - 1].role === "assistant") turns.push({ role: "user", content: "Continúa." });
+        run();
+      } : null);
     }).then(function () {
       if (myEpoch !== epoch) return;
       ctl = null;
@@ -493,6 +520,89 @@ textarea:focus-visible { outline: none; }
       input.focus();
     });
   }
+
+  /* Audio */
+  function stopStream() {
+    if (recStream) { recStream.getTracks().forEach(function (t) { t.stop(); }); recStream = null; }
+  }
+  function micIdle() {
+    micBtn.classList.remove("rec");
+    micBtn.innerHTML = ICON_MIC;
+    micBtn.setAttribute("aria-label", "Grabar audio");
+    micBtn.title = "Grabar audio";
+    refresh();
+  }
+  function transcribe(blob, type) {
+    transcribing = true;
+    var oldPh = input.placeholder;
+    input.placeholder = "Transcribiendo audio…";
+    refresh();
+    fetch(ENDPOINT + "/transcribe", {
+      method: "POST",
+      headers: { "content-type": type || "audio/webm" },
+      body: blob
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (d) {
+        if (!r.ok || typeof d.text !== "string") {
+          throw new Error("HTTP " + r.status + (d.error ? " " + d.error : "") + (d.detail ? ": " + d.detail : ""));
+        }
+        if (!d.text) { addNote("No se entendió nada en el audio."); return; }
+        input.value = (input.value ? input.value + " " : "") + d.text;
+        grow();
+        input.focus();
+      });
+    }).catch(function (err) {
+      addNote("No se pudo transcribir el audio. [" + String(err && err.message ? err.message : err).slice(0, 300) + "]");
+    }).then(function () {
+      transcribing = false;
+      input.placeholder = oldPh;
+      refresh();
+    });
+  }
+  function startRec() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === "undefined") {
+      addNote("Tu navegador no permite grabar audio.");
+      return;
+    }
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+      recStream = stream;
+      recChunks = [];
+      recDiscard = false;
+      var mime = "";
+      ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg"].some(function (m) {
+        if (MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(m)) { mime = m; return true; }
+        return false;
+      });
+      recorder = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+      recorder.ondataavailable = function (e) { if (e.data && e.data.size) recChunks.push(e.data); };
+      recorder.onstop = function () {
+        clearTimeout(recTimer);
+        var type = (recorder && recorder.mimeType) || mime || "audio/webm";
+        stopStream();
+        micIdle();
+        recorder = null;
+        if (recDiscard || !recChunks.length) return;
+        var blob = new Blob(recChunks, { type: type });
+        recChunks = [];
+        if (blob.size < 1000) { addNote("El audio es demasiado corto."); return; }
+        transcribe(blob, type);
+      };
+      recorder.start();
+      micBtn.classList.add("rec");
+      micBtn.innerHTML = ICON_STOP;
+      micBtn.setAttribute("aria-label", "Parar grabación");
+      micBtn.title = "Parar grabación";
+      recTimer = setTimeout(function () { if (recorder && recorder.state === "recording") recorder.stop(); }, MAX_REC_MS);
+    }).catch(function () {
+      stopStream();
+      addNote("No se pudo acceder al micrófono. Permite el acceso en el navegador e inténtalo de nuevo.");
+    });
+  }
+  micBtn.addEventListener("click", function () {
+    if (recorder && recorder.state === "recording") { recorder.stop(); return; }
+    if (busy || transcribing) return;
+    startRec();
+  });
 
   function send(text) {
     text = (text || "").trim();
@@ -514,6 +624,7 @@ textarea:focus-visible { outline: none; }
   function reset() {
     epoch++;
     if (ctl) { try { ctl.abort(); } catch (e) {} ctl = null; }
+    if (recorder && recorder.state === "recording") { recDiscard = true; recorder.stop(); }
     turns = [];
     busy = false;
     sendBtn.innerHTML = ICON_SEND;
