@@ -389,7 +389,7 @@ textarea:focus-visible { outline: none; }
       var note = document.createElement("div");
       note.className = "note";
       var msg = document.createElement("span");
-      msg.textContent = errorCopy(code);
+      msg.textContent = errorCopy(code) + (e && e.detail ? " [" + e.detail + "]" : "");
       note.appendChild(msg);
       if (code !== "prompt_too_large") {
         var rb = document.createElement("button");
@@ -462,6 +462,7 @@ textarea:focus-visible { outline: none; }
   resetBtn.addEventListener("click", reset);
 
   var ENDPOINT = "https://eco.x-mayor.workers.dev";
+  var PAGE_VERSION = "web 1.1";
 
   sample = function (payload, opts) {
     return fetch(ENDPOINT, {
@@ -471,12 +472,21 @@ textarea:focus-visible { outline: none; }
       signal: opts.signal
     }).then(function (r) {
       return r.json().catch(function () { return {}; }).then(function (d) {
-        if (!r.ok || !d.text) throw { code: r.status === 429 ? "rate_limited" : "upstream_error" };
+        if (d.version) fine.textContent = "Eco puede equivocarse. Comprueba los datos importantes. · " + PAGE_VERSION + " · " + d.version + " · " + d.model;
+        if (!r.ok || !d.text) {
+          throw {
+            code: r.status === 429 ? "rate_limited" : "upstream_error",
+            detail: ("HTTP " + r.status + (d.error ? " " + d.error : "") + (d.detail ? ": " + d.detail : "")).slice(0, 300)
+          };
+        }
         if (opts.onText) opts.onText({ text: d.text, delta: d.text });
         return { text: d.text, truncated: !!d.truncated };
       });
     }, function (err) {
-      throw { code: err && err.name === "AbortError" ? "cancelled" : "upstream_error" };
+      throw {
+        code: err && err.name === "AbortError" ? "cancelled" : "upstream_error",
+        detail: err && err.name !== "AbortError" ? "Sin conexión con el Worker: " + (err.message || err) : ""
+      };
     });
   };
   refresh();
