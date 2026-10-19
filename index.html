@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Eco</title>
+<link rel="icon" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
@@ -74,7 +75,7 @@ body {
 header { flex: none; border-bottom: 1px solid var(--line); }
 header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 14px; }
 .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.brand svg { flex: none; color: var(--accent); }
+.brand .logo { flex: none; width: 34px; height: 34px; border-radius: 9px; object-fit: cover; object-position: center; display: block; }
 .brand h1 { margin: 0; font-family: var(--font-display); font-size: 1.5rem; line-height: 1; font-weight: 700; letter-spacing: -0.02em; }
 .brand span { font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ghost {
@@ -91,6 +92,12 @@ header .wrap { display: flex; align-items: center; justify-content: space-betwee
 main { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scroll-behavior: smooth; }
 main .wrap { padding-block: 28px; display: flex; flex-direction: column; gap: 26px; }
 
+.hello .hero {
+  display: block; width: 84px; height: 84px; margin: 0 0 18px;
+  border-radius: 22px; object-fit: cover; object-position: center;
+  animation: float 5s ease-in-out infinite;
+}
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 .hello h2 {
   margin: 0 0 10px;
   font-family: var(--font-display); font-weight: 700;
@@ -203,6 +210,7 @@ textarea:focus-visible { outline: none; }
 @media (prefers-reduced-motion: reduce) {
   .dots i { animation: none; opacity: 0.7; }
   .msg { animation: none; }
+  .hello .hero { animation: none; }
   .icon.rec { animation: none; }
   .tiers .pill { transition: none; }
   main { scroll-behavior: auto; }
@@ -214,11 +222,7 @@ textarea:focus-visible { outline: none; }
 <header>
   <div class="wrap">
     <div class="brand">
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-        <circle cx="9" cy="14" r="3.2" fill="currentColor"/>
-        <path d="M15 8.2a8.2 8.2 0 0 1 0 11.6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
-        <path d="M19.6 4.6a14 14 0 0 1 0 18.8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity="0.55"/>
-      </svg>
+      <img src="logo.png" alt="Logo de Eco" class="logo" width="34" height="34">
       <h1>Eco</h1>
       <span id="tierLabel">Basic</span>
     </div>
@@ -229,6 +233,7 @@ textarea:focus-visible { outline: none; }
 <main id="scroll">
   <div class="wrap" id="chat">
     <section class="hello" id="hello">
+      <img src="logo.png" alt="" class="hero" width="84" height="84">
       <h2>Pregúntame lo que quieras.</h2>
       <p>Escribe en español o en cualquier otro idioma, o pulsa el micrófono y dímelo con tu voz. Puedo explicar, redactar, resumir, traducir o ayudarte con código.</p>
       <div class="chips" id="chips"></div>
@@ -279,7 +284,7 @@ textarea:focus-visible { outline: none; }
     pro:    { name: "Pro",    index: 2, desc: "El más listo, algo más lento" }
   };
 
-  var PAGE_VERSION = "web 1.3";
+  var PAGE_VERSION = "web 1.4";
   var ENDPOINT = "https://eco.x-mayor.workers.dev";
   var MAX_REC_MS = 120000;
 
