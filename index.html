@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Eco</title>
 <link rel="icon" href="logo.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
@@ -141,6 +143,8 @@ main .wrap { padding-block: 26px 18px; display: flex; flex-direction: column; ga
 .body code { font-family: var(--font-mono); font-size: .88em; background: var(--code-bg); border-radius: 5px; padding: .1em .38em; }
 .body pre { margin: 0 0 .8em; background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; overflow-x: auto; }
 .body pre code { background: none; padding: 0; font-size: .84rem; line-height: 1.6; }
+.body .katex { font-size: 1.05em; }
+.body .katex-display { margin: .9em 0; overflow-x: auto; overflow-y: hidden; padding: 2px 0; }
 
 .tools { display: flex; gap: 14px; align-items: center; margin-top: 6px; }
 .tools button { font: inherit; font-size: .78rem; background: none; border: none; color: var(--muted); cursor: pointer; padding: 2px 0; transition: color .2s; }
@@ -330,6 +334,7 @@ textarea:focus-visible { outline: none; }
   var RULES = "Eres Eco, un asistente de IA que vive en una página web. " +
     "Responde en el idioma que use la persona (por defecto, español). Sé claro, directo y útil, sin rodeos. " +
     "Formato permitido: párrafos cortos, listas con guiones o números, **negrita**, `código` en línea y bloques de código con ```. " +
+    "Para fórmulas matemáticas puedes usar LaTeX entre \\( ... \\) en línea o entre $$ ... $$ en bloque. " +
     "No uses encabezados ni tablas. Si no sabes algo, dilo. No puedes navegar por internet ni recordar otras conversaciones.";
 
   var TITLE_RULES = "Tu única tarea es escribir un título muy corto (de 2 a 5 palabras) que resuma de qué trata una conversación. " +
@@ -364,7 +369,7 @@ textarea:focus-visible { outline: none; }
 
   var TIERS = { basic: { index: 0 }, medium: { index: 1 }, pro: { index: 2 } };
 
-  var PAGE_VERSION = "web 1.7";
+  var PAGE_VERSION = "web 1.8";
   var ENDPOINT = "https://eco.x-mayor.workers.dev";
   var MAX_REC_MS = 120000;
   var STORE_KEY = "eco-chats";
@@ -389,11 +394,27 @@ textarea:focus-visible { outline: none; }
   var ICON_DOWN = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var ICON_TRASH = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 7h14M10 7V4h4v3m-8 0l1 13h10l1-13M10 11v6m4-6v6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
+  /* ---------- Formato del texto (negrita, código, fórmulas) ---------- */
   function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function tex(src, display) {
+    if (window.katex) {
+      try { return window.katex.renderToString(src, { displayMode: display, throwOnError: false }); } catch (e) {}
+    }
+    return "<code>" + esc(src) + "</code>";
+  }
   function inline(s) {
+    var maths = [];
+    s = s.replace(/\\\(([\s\S]+?)\\\)|\\\[([\s\S]+?)\\\]|\$\$([\s\S]+?)\$\$|\$([^$\n]+?)\$/g, function (m, a, b, c, d) {
+      var src = a != null ? a : b != null ? b : c != null ? c : d;
+      var display = a == null && d == null;
+      if (d != null && /^\s|\s$|^\d/.test(d)) return m;
+      maths.push(tex(src, display));
+      return "\u0000" + (maths.length - 1) + "\u0000";
+    });
     s = esc(s);
     s = s.replace(/`([^`\n]+)`/g, "<code>$1</code>");
     s = s.replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>");
+    s = s.replace(/\u0000(\d+)\u0000/g, function (m, i) { return maths[+i]; });
     return s;
   }
   function md(text) {
@@ -466,6 +487,8 @@ textarea:focus-visible { outline: none; }
   function cleanForSpeech(text) {
     return text
       .replace(/```[\s\S]*?(```|$)/g, " Aquí hay un bloque de código. ")
+      .replace(/\\\[[\s\S]*?\\\]|\$\$[\s\S]*?\$\$/g, " Aquí hay una fórmula. ")
+      .replace(/\\\([\s\S]*?\\\)/g, " una fórmula ")
       .replace(/`([^`]*)`/g, "$1")
       .replace(/\*\*([^*]*)\*\*/g, "$1")
       .replace(/https?:\/\/\S+/g, " enlace ")
