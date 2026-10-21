@@ -1,1 +1,1 @@
-https://xmayor-sys.github.io/eco-ai/
+https://ekovozia.pages.dev/
