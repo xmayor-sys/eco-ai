@@ -7,8 +7,11 @@
 <meta name="description" content="Ekovozia es un asistente de inteligencia artificial gratuito en español: escribe o habla, guarda tus conversaciones y escucha las respuestas en voz alta.">
 <meta name="theme-color" content="#2E4BDB">
 <link rel="canonical" href="https://ekovozia.pages.dev/">
-<link rel="icon" href="logo.png">
-<link rel="apple-touch-icon" href="logo.png">
+
+<!-- Favicon con URL absoluta para que Google lo detecte -->
+<link rel="icon" href="https://ekovozia.pages.dev/logo.png" type="image/png">
+<link rel="apple-touch-icon" href="https://ekovozia.pages.dev/logo.png">
+
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Ekovozia">
 <meta property="og:title" content="Ekovozia - Asistente de IA con voz">
@@ -19,9 +22,20 @@
 <meta name="twitter:title" content="Ekovozia - Asistente de IA con voz">
 <meta name="twitter:description" content="Asistente de IA gratuito en español: escribe o habla y escucha las respuestas.">
 <meta name="twitter:image" content="https://ekovozia.pages.dev/logo.png">
+
+<!-- Esquema para indicarle a Google el nombre exacto del sitio -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Ekovozia",
+  "url": "https://ekovozia.pages.dev/"
+}
+</script>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"WebApplication","name":"Ekovozia","url":"https://ekovozia.pages.dev/","applicationCategory":"UtilitiesApplication","inLanguage":"es","description":"Asistente de inteligencia artificial gratuito en español con entrada y salida de voz.","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}}
 </script>
+
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -391,7 +405,7 @@ textarea:focus-visible { outline: none; }
   var TIERS = { basic: { index: 0 }, medium: { index: 1 }, pro: { index: 2 } };
 
   var PAGE_VERSION = "web 1.9";
-  var ENDPOINT = "https://eco.x-mayor.workers.dev";
+  var ENDPOINT = "[https://eco.x-mayor.workers.dev](https://eco.x-mayor.workers.dev)";
   var MAX_REC_MS = 120000;
   var STORE_KEY = "eco-chats";
   var MAX_CHATS = 50;
