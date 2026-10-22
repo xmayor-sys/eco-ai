@@ -3,8 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Eco</title>
+<title>Ekovozia - Asistente de IA con voz, gratis y en español</title>
+<meta name="description" content="Ekovozia es un asistente de inteligencia artificial gratuito en español: escribe o habla, guarda tus conversaciones y escucha las respuestas en voz alta.">
+<meta name="theme-color" content="#2E4BDB">
+<link rel="canonical" href="https://ekovozia.pages.dev/">
 <link rel="icon" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Ekovozia">
+<meta property="og:title" content="Ekovozia - Asistente de IA con voz">
+<meta property="og:description" content="Asistente de IA gratuito en español: escribe o habla y escucha las respuestas.">
+<meta property="og:url" content="https://ekovozia.pages.dev/">
+<meta property="og:image" content="https://ekovozia.pages.dev/logo.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Ekovozia - Asistente de IA con voz">
+<meta name="twitter:description" content="Asistente de IA gratuito en español: escribe o habla y escucha las respuestas.">
+<meta name="twitter:image" content="https://ekovozia.pages.dev/logo.png">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"Ekovozia","url":"https://ekovozia.pages.dev/","applicationCategory":"UtilitiesApplication","inLanguage":"es","description":"Asistente de inteligencia artificial gratuito en español con entrada y salida de voz.","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}}
+</script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -82,7 +99,11 @@ body {
 header { flex: none; border-bottom: 1px solid var(--line); }
 header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 10px; }
 .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.brand .logo { width: 30px; height: 30px; border-radius: 8px; object-fit: cover; object-position: center; display: block; flex: none; }
+.brand .logo {
+  flex: none; display: block;
+  width: 40px; height: 40px; min-width: 40px; aspect-ratio: 1 / 1;
+  border-radius: 12px; object-fit: cover; object-position: center;
+}
 .brand h1 { margin: 0; font-family: var(--font-display); font-size: 1.35rem; line-height: 1; font-weight: 700; letter-spacing: -0.02em; }
 .actions { display: flex; align-items: center; gap: 4px; flex: none; }
 .ibtn {
@@ -133,7 +154,7 @@ main .wrap { padding-block: 26px 18px; display: flex; flex-direction: column; ga
   padding: 10px 15px; max-width: min(86%, 540px); white-space: pre-wrap; overflow-wrap: anywhere;
 }
 .msg.eco { display: flex; gap: 12px; align-items: flex-start; }
-.avatar { flex: none; width: 28px; height: 28px; border-radius: 8px; object-fit: cover; object-position: center; margin-top: 2px; }
+.avatar { flex: none; width: 30px; height: 30px; min-width: 30px; aspect-ratio: 1 / 1; border-radius: 9px; object-fit: cover; object-position: center; margin-top: 2px; }
 .col { flex: 1; min-width: 0; }
 .msg.eco .body { overflow-wrap: anywhere; min-width: 0; }
 .body p { margin: 0 0 .8em; }
@@ -265,8 +286,8 @@ textarea:focus-visible { outline: none; }
       <button type="button" class="ibtn" id="menuBtn" aria-label="Abrir historial de conversaciones" title="Historial">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       </button>
-      <img src="logo.png" alt="" class="logo" width="30" height="30">
-      <h1>Eco</h1>
+      <img src="logo.png" alt="Logo de Ekovozia" class="logo">
+      <h1>Ekovozia</h1>
     </div>
     <div class="actions">
       <button type="button" class="ibtn" id="voiceToggle" aria-pressed="false" aria-label="Leer las respuestas en voz alta" title="Leer las respuestas en voz alta" hidden>
@@ -298,7 +319,7 @@ textarea:focus-visible { outline: none; }
     <section class="hello" id="hello">
       <img src="logo.png" alt="" class="hero" width="72" height="72">
       <h2>Pregúntame lo que quieras.</h2>
-      <p>Escribe o dímelo con el micrófono. Puedo explicar, redactar, resumir, traducir o ayudarte con código.</p>
+      <p>Soy Ekovozia, tu asistente de IA. Escribe o háblame con el micrófono, y si quieres, te leo las respuestas en voz alta. Puedo explicar, redactar, resumir, traducir o ayudarte con código.</p>
       <div class="chips" id="chips"></div>
       <button type="button" class="shuffle" id="shuffle">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9M20 4v5h-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -310,7 +331,7 @@ textarea:focus-visible { outline: none; }
 
 <footer>
   <div class="wrap">
-    <div class="tiers" id="tiers" role="radiogroup" aria-label="Versión de Eco">
+    <div class="tiers" id="tiers" role="radiogroup" aria-label="Versión de Ekovozia">
       <span class="pill" id="pill" aria-hidden="true"></span>
       <button type="button" role="radio" data-tier="basic" aria-checked="true" title="Rápido y ligero">Basic</button>
       <button type="button" role="radio" data-tier="medium" aria-checked="false" title="Equilibrado">Medium</button>
@@ -320,18 +341,18 @@ textarea:focus-visible { outline: none; }
       <button type="button" class="ibtn mic" id="mic" aria-label="Grabar audio" title="Grabar audio">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3" stroke="currentColor" stroke-width="2"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       </button>
-      <textarea id="input" rows="1" placeholder="Escribe tu mensaje…" aria-label="Mensaje para Eco"></textarea>
+      <textarea id="input" rows="1" placeholder="Escribe tu mensaje…" aria-label="Mensaje para Ekovozia"></textarea>
       <button type="submit" class="send" id="send" aria-label="Enviar mensaje" disabled>
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 14.5V3.5M9 3.5L4 8.5M9 3.5L14 8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
     </form>
-    <p class="fine" id="fine">Eco puede equivocarse. Comprueba los datos importantes.</p>
+    <p class="fine" id="fine">Ekovozia puede equivocarse. Comprueba los datos importantes.</p>
   </div>
 </footer>
 
 <script>
 (function () {
-  var RULES = "Eres Eco, un asistente de IA que vive en una página web. " +
+  var RULES = "Eres Ekovozia, un asistente de IA que vive en una página web. " +
     "Responde en el idioma que use la persona (por defecto, español). Sé claro, directo y útil, sin rodeos. " +
     "Formato permitido: párrafos cortos, listas con guiones o números, **negrita**, `código` en línea y bloques de código con ```. " +
     "Para fórmulas matemáticas puedes usar LaTeX entre \\( ... \\) en línea o entre $$ ... $$ en bloque. " +
@@ -369,7 +390,7 @@ textarea:focus-visible { outline: none; }
 
   var TIERS = { basic: { index: 0 }, medium: { index: 1 }, pro: { index: 2 } };
 
-  var PAGE_VERSION = "web 1.8";
+  var PAGE_VERSION = "web 1.9";
   var ENDPOINT = "https://eco.x-mayor.workers.dev";
   var MAX_REC_MS = 120000;
   var STORE_KEY = "eco-chats";
@@ -730,12 +751,12 @@ textarea:focus-visible { outline: none; }
     if (!c) return;
     var lines = [
       c.title,
-      "Exportado el " + new Date().toLocaleString("es-ES") + " · Eco " + PAGE_VERSION,
+      "Exportado el " + new Date().toLocaleString("es-ES") + " · Ekovozia " + PAGE_VERSION,
       "========================================",
       ""
     ];
     c.turns.forEach(function (t) {
-      lines.push(t.role === "user" ? "TÚ:" : "ECO:");
+      lines.push(t.role === "user" ? "TÚ:" : "EKOVOZIA:");
       lines.push(t.content);
       lines.push("");
     });
@@ -744,7 +765,7 @@ textarea:focus-visible { outline: none; }
     var a = document.createElement("a");
     var slug = norm(c.title).replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "conversacion";
     a.href = url;
-    a.download = "eco-" + slug + ".txt";
+    a.download = "ekovozia-" + slug + ".txt";
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -826,7 +847,7 @@ textarea:focus-visible { outline: none; }
 
   function addEco() {
     var eco = buildEco();
-    eco.body.innerHTML = '<span class="dots" role="status" aria-label="Eco está pensando"><i></i><i></i><i></i></span>';
+    eco.body.innerHTML = '<span class="dots" role="status" aria-label="Ekovozia está pensando"><i></i><i></i><i></i></span>';
     toBottom();
     return eco;
   }
@@ -870,8 +891,8 @@ textarea:focus-visible { outline: none; }
 
   function errorCopy(code) {
     switch (code) {
-      case "rate_limited": return "Has alcanzado el límite de uso por ahora. Espera un momento o prueba otra versión de Eco.";
-      case "refused": return "Eco no puede responder a ese mensaje. Prueba a plantearlo de otra forma.";
+      case "rate_limited": return "Has alcanzado el límite de uso por ahora. Espera un momento o prueba otra versión de Ekovozia.";
+      case "refused": return "Ekovozia no puede responder a ese mensaje. Prueba a plantearlo de otra forma.";
       case "prompt_too_large": return "La conversación es demasiado larga. Empieza una nueva.";
       default: return "No se pudo completar la respuesta. Inténtalo de nuevo.";
     }
@@ -1161,7 +1182,7 @@ textarea:focus-visible { outline: none; }
       signal: opts.signal
     }).then(function (r) {
       return r.json().catch(function () { return {}; }).then(function (d) {
-        if (d.version) fine.textContent = "Eco puede equivocarse. Comprueba los datos importantes. · " + PAGE_VERSION + " · " + d.version + (d.model ? " · " + d.model : "");
+        if (d.version) fine.textContent = "Ekovozia puede equivocarse. Comprueba los datos importantes. · " + PAGE_VERSION + " · " + d.version + (d.model ? " · " + d.model : "");
         if (!r.ok || !d.text) {
           throw {
             code: r.status === 429 ? "rate_limited" : "upstream_error",
