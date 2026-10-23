@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Ekovozia - Asistente de IA con voz, gratis y en español</title>
-<meta name="description" content="Ekovozia es un asistente de inteligencia artificial gratuito en español: escribe o habla, busca en internet con fuentes, guarda tus conversaciones y escucha las respuestas en voz alta.">
+<meta name="description" content="Ekovozia es un asistente de inteligencia artificial gratuito: habla o escribe en más de 60 idiomas, busca en internet con fuentes, guarda tus conversaciones y escucha las respuestas en voz alta.">
 <meta name="application-name" content="Ekovozia">
 <meta name="apple-mobile-web-app-title" content="Ekovozia">
 <meta name="theme-color" content="#2E4BDB">
@@ -16,18 +16,18 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Ekovozia">
 <meta property="og:title" content="Ekovozia - Asistente de IA con voz">
-<meta property="og:description" content="Asistente de IA gratuito en español: escribe o habla y escucha las respuestas.">
+<meta property="og:description" content="Asistente de IA gratuito en más de 60 idiomas: escribe o habla y escucha las respuestas.">
 <meta property="og:url" content="https://ekovozia.pages.dev/">
 <meta property="og:image" content="https://ekovozia.pages.dev/logo.png">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Ekovozia - Asistente de IA con voz">
-<meta name="twitter:description" content="Asistente de IA gratuito en español: escribe o habla y escucha las respuestas.">
+<meta name="twitter:description" content="Asistente de IA gratuito en más de 60 idiomas: escribe o habla y escucha las respuestas.">
 <meta name="twitter:image" content="https://ekovozia.pages.dev/logo.png">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"WebSite","name":"Ekovozia","alternateName":["Ekovozia IA","Ekovozia asistente de IA"],"url":"https://ekovozia.pages.dev/","inLanguage":"es"}
 </script>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebApplication","name":"Ekovozia","url":"https://ekovozia.pages.dev/","applicationCategory":"UtilitiesApplication","inLanguage":"es","description":"Asistente de inteligencia artificial gratuito en español con entrada y salida de voz.","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}}
+{"@context":"https://schema.org","@type":"WebApplication","name":"Ekovozia","url":"https://ekovozia.pages.dev/","applicationCategory":"UtilitiesApplication","inLanguage":"es","description":"Asistente de inteligencia artificial gratuito con entrada y salida de voz en más de 60 idiomas.","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}}
 </script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" onload="window.__katexReady && window.__katexReady()"></script>
@@ -99,7 +99,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 .wrap { width: 100%; max-width: 740px; margin-inline: auto; }
-:where(button, textarea, input, summary):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+:where(button, textarea, input, summary, select):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 [hidden] { display: none !important; }
 
 /* Cabecera */
@@ -232,6 +232,19 @@ footer .wrap { padding-top: 8px; }
 .opt:hover { color: var(--accent); border-color: var(--accent); }
 .opt[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 
+.langwrap {
+  display: inline-flex; align-items: center; gap: 6px; padding: 0 6px 0 11px;
+  border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--muted);
+  transition: color .2s, border-color .2s, background .2s; cursor: pointer;
+}
+.langwrap:hover, .langwrap:focus-within { color: var(--accent); border-color: var(--accent); }
+.langwrap.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.langwrap select {
+  font: inherit; font-size: .78rem; color: inherit; background: transparent; border: none;
+  padding: 5px 2px; cursor: pointer; max-width: 150px; text-overflow: ellipsis;
+}
+.langwrap select option { color: var(--ink); background: var(--surface); }
+
 form {
   display: flex; align-items: flex-end; gap: 4px; background: var(--surface);
   border: 1px solid var(--line); border-radius: 20px; padding: 6px;
@@ -349,7 +362,7 @@ textarea:focus-visible { outline: none; }
     <section class="hello" id="hello">
       <img src="logo.png" alt="" class="hero" width="72" height="72">
       <h2>Pregúntame lo que quieras.</h2>
-      <p>Soy Ekovozia, tu asistente de IA. Escribe o háblame con el micrófono, pega un enlace para que lo lea, activa «Web» para buscar en internet con fuentes, y si quieres, te leo las respuestas en voz alta.</p>
+      <p>Soy Ekovozia, tu asistente de IA. Escribe o háblame con el micrófono en más de 60 idiomas, pega un enlace para que lo lea, activa «Web» para buscar con fuentes, y si quieres, te leo las respuestas en voz alta.</p>
       <div class="chips" id="chips"></div>
       <button type="button" class="shuffle" id="shuffle">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9M20 4v5h-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -376,6 +389,10 @@ textarea:focus-visible { outline: none; }
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="8" cy="9" r="3" stroke="currentColor" stroke-width="2"/><circle cx="17" cy="10" r="2.5" stroke="currentColor" stroke-width="2"/><path d="M2 20c0-3.3 2.7-6 6-6s6 2.7 6 6M15 15.2c.6-.2 1.3-.3 2-.3 2.8 0 5 2.2 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         Consejo de IAs
       </button>
+      <label class="langwrap" id="langWrap" title="Idioma de las respuestas, del micrófono y de la voz">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 5h8M8 3v2M5.5 5c.5 3 2.5 5.5 5 7M11 5c-.5 3-3 6-6.5 8M13 20l4-10 4 10M14.5 16.5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <select id="lang" aria-label="Idioma de las respuestas, del micrófono y de la voz"></select>
+      </label>
     </div>
     <form id="form" autocomplete="off">
       <button type="button" class="ibtn mic" id="mic" aria-label="Grabar audio" title="Grabar audio">
@@ -425,12 +442,65 @@ textarea:focus-visible { outline: none; }
     "Escribe un chiste de programadores",
     "¿Cómo se hace un buen currículum?",
     "Dame cinco consejos para dormir mejor",
-    "Explícame cómo funciona internet paso a paso"
+    "Explícame cómo funciona internet paso a paso",
+    "Enséñame a saludar y presentarme en japonés",
+    "Explain how a rainbow forms in simple words",
+    "Aide-moi à écrire un message poli pour annuler un rendez-vous"
   ];
+
+  /* 60 idiomas: código, nombre en su propio idioma */
+  var LANGS = [
+    ["es", "Español"], ["en", "English"], ["fr", "Français"], ["de", "Deutsch"], ["it", "Italiano"],
+    ["pt", "Português"], ["ca", "Català"], ["eu", "Euskara"], ["gl", "Galego"], ["nl", "Nederlands"],
+    ["sv", "Svenska"], ["da", "Dansk"], ["no", "Norsk"], ["fi", "Suomi"], ["is", "Íslenska"],
+    ["pl", "Polski"], ["cs", "Čeština"], ["sk", "Slovenčina"], ["hu", "Magyar"], ["ro", "Română"],
+    ["bg", "Български"], ["el", "Ελληνικά"], ["ru", "Русский"], ["uk", "Українська"], ["sr", "Српски"],
+    ["hr", "Hrvatski"], ["sl", "Slovenščina"], ["lt", "Lietuvių"], ["lv", "Latviešu"], ["et", "Eesti"],
+    ["tr", "Türkçe"], ["ar", "العربية"], ["he", "עברית"], ["fa", "فارسی"], ["ur", "اردو"],
+    ["hi", "हिन्दी"], ["bn", "বাংলা"], ["ta", "தமிழ்"], ["te", "తెలుగు"], ["mr", "मराठी"],
+    ["gu", "ગુજરાતી"], ["pa", "ਪੰਜਾਬੀ"], ["ne", "नेपाली"], ["th", "ไทย"], ["vi", "Tiếng Việt"],
+    ["id", "Bahasa Indonesia"], ["ms", "Bahasa Melayu"], ["tl", "Filipino"], ["zh", "中文"], ["ja", "日本語"],
+    ["ko", "한국어"], ["sw", "Kiswahili"], ["af", "Afrikaans"], ["am", "አማርኛ"], ["ha", "Hausa"],
+    ["yo", "Yorùbá"], ["cy", "Cymraeg"], ["ka", "ქართული"], ["hy", "Հայերեն"], ["kk", "Қазақша"]
+  ];
+
+  /* Palabras muy comunes para reconocer idiomas con alfabeto latino */
+  var STOP = {
+    es: "el la de que y en los las un una es por con para no se su al lo como pero qué cómo más muy está esto esta también porque",
+    en: "the and of to in is that it for with as was on are this be at by not you have from or what how why can your",
+    fr: "le la les des et est une un du de que qui dans pour pas sur au avec ce il elle vous nous je tu ne se en comment pourquoi plus",
+    de: "der die das und ist nicht ein eine zu den mit für auf ich sie es von dem im wie warum auch sich aber wir",
+    it: "il lo la gli le di che e è un una per con non sono come più del della questo perché anche io tu si ma",
+    pt: "o a os as de que e é um uma para com não em se por mais como foi mas você são isso também porque",
+    ca: "el la els les de que i és un una per amb no es com més però això també perquè molt del al",
+    nl: "de het een en van is dat niet te op voor met zijn ik je ze er maar ook als dit wat hoe waarom",
+    sv: "och att det som en är på för med inte av den till har jag du vi men om så hur varför",
+    da: "og at det en er på for med ikke af den til har jeg du vi men om så hvordan hvorfor",
+    no: "og å det som en er på for med ikke av den til har jeg du vi men om så hvordan hvorfor",
+    pl: "i w nie to się na jest z do że jak co ale czy dla po od są tak jego tego dlaczego",
+    cs: "a v se na je to že s z do pro jak ale ne by už tak jsou co proč který",
+    sk: "a je v sa na to že s z do pre ako ale nie sú čo prečo",
+    ro: "și în de la cu nu este un o pe că care mai sau pentru dar cum ce din acest foarte",
+    tr: "ve bir bu da de için ile çok ne gibi ama daha var mı değil nasıl neden olarak",
+    id: "yang dan di ke dari ini itu untuk dengan tidak adalah pada akan juga ada bagaimana mengapa saya",
+    vi: "và của là có không một những được cho trong này với các để tôi bạn như thế nào tại sao",
+    fi: "ja on ei että se oli hän mutta kun myös tai niin kuin miten miksi",
+    hu: "a az és hogy nem is egy van de ez azt mint vagy miért hogyan",
+    hr: "i je u da se na su za ne to s kao od sam ali kako zašto",
+    af: "die en van is nie dat het in om te vir op met sy hy ons maar hoe waarom",
+    sw: "na ya wa kwa ni za katika la kuwa hii pia sana lakini jinsi nini",
+    tl: "ang ng sa na at ay ito ko mo para hindi may kung bakit paano"
+  };
+  var STOPSETS = {};
+  Object.keys(STOP).forEach(function (k) {
+    var o = {};
+    STOP[k].split(" ").forEach(function (w) { o[w] = 1; });
+    STOPSETS[k] = o;
+  });
 
   var TIERS = { basic: { index: 0 }, medium: { index: 1 }, pro: { index: 2 } };
 
-  var PAGE_VERSION = "web 3.0";
+  var PAGE_VERSION = "web 3.1";
   var ENDPOINT = "https://eco.x-mayor.workers.dev";
   var MAX_REC_MS = 120000;
   var STORE_KEY = "eco-chats";
@@ -443,12 +513,12 @@ textarea:focus-visible { outline: none; }
   var tiersEl = $("tiers"), pill = $("pill"), micBtn = $("mic"), voiceToggle = $("voiceToggle");
   var menuBtn = $("menuBtn"), side = $("side"), scrim = $("scrim"), sideClose = $("sideClose");
   var newChatBtn = $("newChat"), search = $("search"), listEl = $("list");
-  var optWeb = $("optWeb"), optCouncil = $("optCouncil");
+  var optWeb = $("optWeb"), optCouncil = $("optCouncil"), langEl = $("lang"), langWrap = $("langWrap");
 
   var sample = null, turns = [], busy = false, ctl = null, epoch = 0, tier = "pro";
   var recorder = null, recChunks = [], recStream = null, recTimer = null, recDiscard = false, transcribing = false;
   var currentId = null, chats = [], titling = {};
-  var webOn = false, councilOn = false;
+  var webOn = false, councilOn = false, langSel = "auto";
 
   var ICON_SEND = sendBtn.innerHTML;
   var ICON_STOP = '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="3" width="10" height="10" rx="2" fill="currentColor"/></svg>';
@@ -541,33 +611,83 @@ textarea:focus-visible { outline: none; }
   }
   shuffleBtn.addEventListener("click", renderChips);
 
+  /* ---------- Detección del idioma de un texto (para la voz) ---------- */
+  function detectLang(text) {
+    if (langSel !== "auto") return langSel;
+    var t = String(text)
+      .replace(/```[\s\S]*?```/g, " ")
+      .replace(/\\\([\s\S]*?\\\)|\\\[[\s\S]*?\\\]|\$\$[\s\S]*?\$\$/g, " ")
+      .replace(/https?:\/\/\S+/g, " ")
+      .slice(0, 700);
+    var total = (t.match(/\p{L}/gu) || []).length;
+    if (!total) return "";
+    function share(re) { return (t.match(re) || []).length / total; }
+
+    if (share(/[\p{Script=Hiragana}\p{Script=Katakana}]/gu) > 0.1) return "ja";
+    if (share(/\p{Script=Hangul}/gu) > 0.3) return "ko";
+    if (share(/\p{Script=Han}/gu) > 0.3) return "zh";
+    var scripts = [
+      ["th", /\p{Script=Thai}/gu], ["he", /\p{Script=Hebrew}/gu], ["bn", /\p{Script=Bengali}/gu],
+      ["ta", /\p{Script=Tamil}/gu], ["te", /\p{Script=Telugu}/gu], ["gu", /\p{Script=Gujarati}/gu],
+      ["pa", /\p{Script=Gurmukhi}/gu], ["am", /\p{Script=Ethiopic}/gu], ["ka", /\p{Script=Georgian}/gu],
+      ["hy", /\p{Script=Armenian}/gu], ["el", /\p{Script=Greek}/gu], ["hi", /\p{Script=Devanagari}/gu]
+    ];
+    for (var i = 0; i < scripts.length; i++) if (share(scripts[i][1]) > 0.3) return scripts[i][0];
+    if (share(/\p{Script=Arabic}/gu) > 0.3) {
+      if (/[ٹڈڑںے]/.test(t)) return "ur";
+      if (/[پچژگ]/.test(t)) return "fa";
+      return "ar";
+    }
+    if (share(/\p{Script=Cyrillic}/gu) > 0.3) {
+      if (/[әғқңұүһ]/i.test(t)) return "kk";
+      if (/[ђћљњџ]/i.test(t)) return "sr";
+      if (/[їєґі]/i.test(t)) return "uk";
+      if (/[ыэё]/i.test(t)) return "ru";
+      if (/ъ/i.test(t)) return "bg";
+      return "ru";
+    }
+    var words = t.toLowerCase().match(/[\p{L}'’]+/gu) || [];
+    var best = "", bestN = 0;
+    Object.keys(STOPSETS).forEach(function (k) {
+      var n = 0;
+      for (var j = 0; j < words.length; j++) if (STOPSETS[k][words[j]]) n++;
+      if (n > bestN) { bestN = n; best = k; }
+    });
+    return bestN >= 3 ? best : "";
+  }
+
   /* ---------- Voz (la IA te habla) ---------- */
   var synth = window.speechSynthesis;
   var canSpeak = !!synth && typeof window.SpeechSynthesisUtterance !== "undefined";
-  var voices = [], speakToken = 0, speakingBtn = null, autoRead = false;
+  var voices = [], speakToken = 0, speakingBtn = null, autoRead = false, warnedVoice = {};
+  var VOICE_ALIAS = { no: ["no", "nb"], tl: ["fil", "tl"], he: ["he", "iw"], id: ["id", "in"] };
 
   function loadVoices() { try { voices = synth.getVoices() || []; } catch (e) { voices = []; } }
-  function pickVoice() {
+  function pickVoice(code) {
+    if (!code) return null;
+    var prefixes = VOICE_ALIAS[code] || [code];
     var best = null, bestScore = 0;
     voices.forEach(function (v) {
       var lang = (v.lang || "").toLowerCase().replace("_", "-");
-      if (lang.indexOf("es") !== 0) return;
+      if (prefixes.indexOf(lang.split("-")[0]) === -1) return;
       var score = 1;
-      if (lang === "es-es") score += 2;
+      if (code === "es" && lang === "es-es") score += 2;
+      if (code === "en" && (lang === "en-gb" || lang === "en-us")) score += 1;
       if (/natural|online|neural|premium|enhanced/i.test(v.name)) score += 3;
       if (/google/i.test(v.name)) score += 1;
       if (score > bestScore) { best = v; bestScore = score; }
     });
     return best;
   }
-  function cleanForSpeech(text) {
+  function cleanForSpeech(text, lang) {
+    var es = lang === "es" || !lang;
     return text
-      .replace(/```[\s\S]*?(```|$)/g, " Aquí hay un bloque de código. ")
-      .replace(/\\\[[\s\S]*?\\\]|\$\$[\s\S]*?\$\$/g, " Aquí hay una fórmula. ")
-      .replace(/\\\([\s\S]*?\\\)/g, " una fórmula ")
+      .replace(/```[\s\S]*?(```|$)/g, es ? " Aquí hay un bloque de código. " : ". ")
+      .replace(/\\\[[\s\S]*?\\\]|\$\$[\s\S]*?\$\$/g, es ? " Aquí hay una fórmula. " : ". ")
+      .replace(/\\\([\s\S]*?\\\)/g, es ? " una fórmula " : " ")
       .replace(/`([^`]*)`/g, "$1")
       .replace(/\*\*([^*]*)\*\*/g, "$1")
-      .replace(/https?:\/\/\S+/g, " enlace ")
+      .replace(/https?:\/\/\S+/g, es ? " enlace " : " ")
       .replace(/\[\d+\]/g, "")
       .replace(/^\s*[-*•]\s+/gm, "")
       .replace(/^\s*\d+[.)]\s+/gm, "")
@@ -577,9 +697,14 @@ textarea:focus-visible { outline: none; }
       .trim();
   }
   function chunkText(text) {
-    var sentences = text.match(/[^.!?¡¿;:]+[.!?;:]*\s*/g) || [text];
+    var sentences = text.match(/[^.!?¡¿;:。！？।]+[.!?;:。！？।]*\s*/g) || [text];
     var chunks = [], cur = "";
     sentences.forEach(function (s) {
+      while (s.length > 220) {
+        if (cur) { chunks.push(cur); cur = ""; }
+        chunks.push(s.slice(0, 200));
+        s = s.slice(200);
+      }
       if ((cur + s).length > 180 && cur) { chunks.push(cur); cur = s; } else cur += s;
     });
     if (cur.trim()) chunks.push(cur);
@@ -599,11 +724,16 @@ textarea:focus-visible { outline: none; }
   function speak(text, btn) {
     if (!canSpeak) return;
     stopSpeaking();
-    var clean = cleanForSpeech(text);
+    var lang = detectLang(text);
+    var clean = cleanForSpeech(text, lang);
     if (!clean) return;
     var token = ++speakToken;
     var chunks = chunkText(clean);
-    var voice = pickVoice();
+    var voice = pickVoice(lang);
+    if (lang && !voice && voices.length && !warnedVoice[lang]) {
+      warnedVoice[lang] = true;
+      addNote("Tu dispositivo no tiene una voz instalada para este idioma (" + lang + "), así que sonará con la voz por defecto.");
+    }
     speakingBtn = btn || null;
     setSpeakBtn(speakingBtn, true);
     var idx = 0;
@@ -611,7 +741,7 @@ textarea:focus-visible { outline: none; }
       if (token !== speakToken) return;
       if (idx >= chunks.length) { setSpeakBtn(speakingBtn, false); speakingBtn = null; return; }
       var u = new SpeechSynthesisUtterance(chunks[idx++]);
-      u.lang = voice ? voice.lang : "es-ES";
+      u.lang = voice ? voice.lang : (lang || "");
       if (voice) u.voice = voice;
       u.rate = 1;
       u.onend = next;
@@ -640,6 +770,33 @@ textarea:focus-visible { outline: none; }
     });
     window.addEventListener("pagehide", function () { try { synth.cancel(); } catch (e) {} });
   }
+
+  /* ---------- Selector de idioma ---------- */
+  (function () {
+    var o = document.createElement("option");
+    o.value = "auto";
+    o.textContent = "Idioma: automático";
+    langEl.appendChild(o);
+    LANGS.forEach(function (l) {
+      var x = document.createElement("option");
+      x.value = l[0];
+      x.textContent = l[1];
+      langEl.appendChild(x);
+    });
+    try {
+      var sv = localStorage.getItem("ekovozia-lang");
+      if (sv && LANGS.some(function (l) { return l[0] === sv; })) langSel = sv;
+    } catch (e) {}
+    langEl.value = langSel;
+    langWrap.classList.toggle("on", langSel !== "auto");
+    langEl.addEventListener("change", function () {
+      langSel = langEl.value;
+      langWrap.classList.toggle("on", langSel !== "auto");
+      try { localStorage.setItem("ekovozia-lang", langSel); } catch (e) {}
+      stopSpeaking();
+      input.focus();
+    });
+  })();
 
   /* ---------- Historial ---------- */
   function loadAll() {
@@ -1152,7 +1309,7 @@ textarea:focus-visible { outline: none; }
     var oldPh = input.placeholder;
     input.placeholder = "Transcribiendo audio…";
     refresh();
-    fetch(ENDPOINT + "/transcribe", {
+    fetch(ENDPOINT + "/transcribe" + (langSel !== "auto" ? "?lang=" + encodeURIComponent(langSel) : ""), {
       method: "POST",
       headers: { "content-type": type || "audio/webm" },
       body: blob
@@ -1388,6 +1545,7 @@ textarea:focus-visible { outline: none; }
         search: webOn,
         council: councilOn,
         stream: !councilOn,
+        lang: langSel === "auto" ? "" : langSel,
         system: payload[0].content,
         messages: payload.slice(1)
       }),
