@@ -363,9 +363,9 @@ textarea:focus-visible { outline: none; }
   <div class="wrap">
     <div class="tiers" id="tiers" role="radiogroup" aria-label="Versión de Ekovozia">
       <span class="pill" id="pill" aria-hidden="true"></span>
-      <button type="button" role="radio" data-tier="basic" aria-checked="true" title="Rápido y ligero">Basic</button>
+      <button type="button" role="radio" data-tier="basic" aria-checked="false" title="Rápido y ligero">Basic</button>
       <button type="button" role="radio" data-tier="medium" aria-checked="false" title="Equilibrado">Medium</button>
-      <button type="button" role="radio" data-tier="pro" aria-checked="false" title="El más listo, algo más lento">Pro</button>
+      <button type="button" role="radio" data-tier="pro" aria-checked="true" title="El más listo, algo más lento">Pro</button>
     </div>
     <div class="opts">
       <button type="button" class="opt" id="optWeb" aria-pressed="false" title="Buscar en internet y citar las fuentes">
@@ -430,7 +430,7 @@ textarea:focus-visible { outline: none; }
 
   var TIERS = { basic: { index: 0 }, medium: { index: 1 }, pro: { index: 2 } };
 
-  var PAGE_VERSION = "web 2.0";
+  var PAGE_VERSION = "web 3.0";
   var ENDPOINT = "https://eco.x-mayor.workers.dev";
   var MAX_REC_MS = 120000;
   var STORE_KEY = "eco-chats";
@@ -445,7 +445,7 @@ textarea:focus-visible { outline: none; }
   var newChatBtn = $("newChat"), search = $("search"), listEl = $("list");
   var optWeb = $("optWeb"), optCouncil = $("optCouncil");
 
-  var sample = null, turns = [], busy = false, ctl = null, epoch = 0, tier = "basic";
+  var sample = null, turns = [], busy = false, ctl = null, epoch = 0, tier = "pro";
   var recorder = null, recChunks = [], recStream = null, recTimer = null, recDiscard = false, transcribing = false;
   var currentId = null, chats = [], titling = {};
   var webOn = false, councilOn = false;
@@ -512,7 +512,6 @@ textarea:focus-visible { outline: none; }
   }
   function setBody(el, text) { el._raw = text; el.innerHTML = md(text); }
 
-  /* Si KaTeX termina de cargar después, se repintan las fórmulas */
   window.__katexReady = function () {
     Array.prototype.forEach.call(document.querySelectorAll(".msg.eco .body, .council .body"), function (b) {
       if (b._raw) b.innerHTML = md(b._raw);
@@ -868,20 +867,20 @@ textarea:focus-visible { outline: none; }
 
   /* ---------- Selector de versión y opciones ---------- */
   function setTier(t, save) {
-    if (!TIERS[t]) t = "basic";
+    if (!TIERS[t]) t = "pro";
     tier = t;
     pill.style.transform = "translateX(" + (TIERS[t].index * 100) + "%)";
     Array.prototype.forEach.call(tiersEl.querySelectorAll("button"), function (b) {
       b.setAttribute("aria-checked", b.getAttribute("data-tier") === t ? "true" : "false");
     });
-    if (save) { try { localStorage.setItem("eco-tier", t); } catch (e) {} }
+    if (save) { try { localStorage.setItem("ekovozia-tier", t); } catch (e) {} }
   }
   Array.prototype.forEach.call(tiersEl.querySelectorAll("button"), function (b) {
     b.addEventListener("click", function () { setTier(b.getAttribute("data-tier"), true); input.focus(); });
   });
   var savedTier = null;
-  try { savedTier = localStorage.getItem("eco-tier"); } catch (e) {}
-  setTier(savedTier, false);
+  try { savedTier = localStorage.getItem("ekovozia-tier"); } catch (e) {}
+  setTier(savedTier || "pro", false);
 
   function paintOpts() {
     optWeb.setAttribute("aria-pressed", webOn ? "true" : "false");
@@ -1026,7 +1025,7 @@ textarea:focus-visible { outline: none; }
 
   function errorCopy(code) {
     switch (code) {
-      case "rate_limited": return "Has alcanzado el límite de uso por ahora. Espera un momento o prueba otra versión de Ekovozia.";
+      case "rate_limited": return "Vas muy rápido o has llegado al límite de uso. Espera un momento o prueba otra versión de Ekovozia.";
       case "refused": return "Ekovozia no puede responder a ese mensaje. Prueba a plantearlo de otra forma.";
       case "prompt_too_large": return "La conversación es demasiado larga. Empieza una nueva.";
       default: return "No se pudo completar la respuesta. Inténtalo de nuevo.";
@@ -1297,7 +1296,7 @@ textarea:focus-visible { outline: none; }
   });
   resetBtn.addEventListener("click", reset);
 
-  /* ---------- Aparición fluida de la respuesta ---------- */
+  /* ---------- Respuesta completa con aparición fluida (Consejo o plan B) ---------- */
   var REDUCED = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   function reveal(text, onText, signal) {
     return new Promise(function (resolve, reject) {
@@ -1318,6 +1317,68 @@ textarea:focus-visible { outline: none; }
     });
   }
 
+  function setFine(version, model) {
+    fine.textContent = "Ekovozia puede equivocarse. Comprueba los datos importantes. · " + PAGE_VERSION + (version ? " · " + version : "") + (model ? " · " + model : "");
+  }
+
+  /* ---------- Lectura de la respuesta en streaming ---------- */
+  function readStream(r, opts) {
+    return new Promise(function (resolve, reject) {
+      var reader = r.body.getReader();
+      var dec = new TextDecoder();
+      var buf = "", text = "", meta = null, streamErr = "", pending = false;
+
+      function paint() { pending = false; opts.onText({ text: text }); }
+      function schedule() { if (!pending) { pending = true; requestAnimationFrame(paint); } }
+      function handle(line) {
+        line = line.trim();
+        if (!line) return;
+        var j;
+        try { j = JSON.parse(line); } catch (e) { return; }
+        if (j.d) { text += j.d; schedule(); }
+        else if (j.done) { meta = j; }
+        else if (j.error) { streamErr = String(j.error); }
+      }
+      function finish() {
+        if (buf.trim()) handle(buf);
+        if (meta) {
+          setFine(meta.version, meta.model);
+          opts.onText({ text: text });
+          resolve({
+            text: text,
+            truncated: !!meta.truncated,
+            sources: Array.isArray(meta.sources) ? meta.sources : [],
+            opinions: [],
+            warning: meta.warning || ""
+          });
+          return;
+        }
+        if (text) { reject({ code: "upstream_error", detail: streamErr || "La respuesta se cortó", text: text }); return; }
+        reject({ code: "upstream_error", detail: streamErr || "respuesta vacía" });
+      }
+      function pump() {
+        reader.read().then(function (chunk) {
+          if (chunk.done) { finish(); return; }
+          buf += dec.decode(chunk.value, { stream: true });
+          var i;
+          while ((i = buf.indexOf("\n")) > -1) {
+            handle(buf.slice(0, i));
+            buf = buf.slice(i + 1);
+          }
+          pump();
+        }, function (err) {
+          var aborted = (err && err.name === "AbortError") || (opts.signal && opts.signal.aborted);
+          reject({
+            code: aborted ? "cancelled" : "upstream_error",
+            detail: aborted ? "" : "Conexión cortada: " + (err && err.message ? err.message : err),
+            text: text
+          });
+        });
+      }
+      pump();
+    });
+  }
+
   sample = function (payload, opts) {
     return fetch(ENDPOINT, {
       method: "POST",
@@ -1326,13 +1387,16 @@ textarea:focus-visible { outline: none; }
         tier: tier,
         search: webOn,
         council: councilOn,
+        stream: !councilOn,
         system: payload[0].content,
         messages: payload.slice(1)
       }),
       signal: opts.signal
     }).then(function (r) {
+      var ct = r.headers.get("content-type") || "";
+      if (r.ok && ct.indexOf("ndjson") > -1 && r.body) return readStream(r, opts);
       return r.json().catch(function () { return {}; }).then(function (d) {
-        if (d.version) fine.textContent = "Ekovozia puede equivocarse. Comprueba los datos importantes. · " + PAGE_VERSION + " · " + d.version + (d.model ? " · " + d.model : "");
+        if (d.version) setFine(d.version, d.model);
         if (!r.ok || !d.text) {
           throw {
             code: r.status === 429 ? "rate_limited" : "upstream_error",
